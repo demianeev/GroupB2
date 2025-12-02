@@ -11,4 +11,5 @@ In this section, you can find an overview of two projects carried out in the Rob
 - Luis Prieto F11303116
 - Eduardo Vazquez F11303117
 
-<img width="225" height="225" alt="UPTP" src="https://github.com/user-attachments/assets/af4a3c16-0ea9-4848-b715-d77977c50e1c" />
+<img width="5360" height="1000" alt="image" src="https://github.com/user-attachments/assets/273b1228-8c30-40ee-9258-3e054ff42de4" />
+
