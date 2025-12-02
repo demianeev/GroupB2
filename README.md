@@ -2,6 +2,7 @@
 <p style="font-size:20px;">
 In this section, you can find an overview of two projects carried out in the Robotics Lab by group B2. For more detailed information, please check the links to “Introduction to Robotics” and “Introduction to Robotics Tutorial.”
 </p>
+
 ---
 **𝙂𝙧𝙤𝙪𝙥 𝙈𝙚𝙢𝙗𝙚𝙧𝙨**
 - Leonardo Barrios F11303103
