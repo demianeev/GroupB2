@@ -1,7 +1,7 @@
 Introduction to robotics tutorial - Team B2 – Final Project 🤖
 --- 
 <p style="font-size:20px;">
-In this section, you can find an overview of two projects carried out in the Robotics Lab by group B2. For more detailed information, please check the links to “Introduction to Robotics” and “Introduction to Robotics Tutorial.”
+In this section, you can find an overview of two projects carried out in the Robotics Lab by group B2. For more detailed information, please check the link to “Introduction to Robotics Tutorial”.
 </p>
 
 ---
