@@ -6,7 +6,7 @@ This repository contains the documentation, source code, and hardware schematics
 
 ---
 
-Hardware Architecture
+## Hardware Architecture
 The control logic is based on the interaction between the Robot I/O Terminal (NPN configuration) and external field devices. The architecture is defined by the attached I/O diagram and includes the following subsystems:
 
 Power Supply
