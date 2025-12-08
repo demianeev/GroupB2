@@ -33,11 +33,11 @@ The system controls movement through solenoid valves and monitors status via pos
 ## Operator Interface Pinout
 The system includes a hardwired I/O Box for manual operator control. The wiring configuration links physical buttons to specific signal names within the robot controller.
 
-Pin 2 (Green): Start - Signal 0
-Pin 3 (White): Task 1 - Signal 1
-Pin 4 (Blue): Task 2 - Signal 2
-Pin 5 (Orange): Maintenance Point - Signal 3
-Pin 6 (Red): Stop - Signal 4
+*Pin 2 (Green): Start - Signal 0*
+*Pin 3 (White): Task 1 - Signal 1*
+*Pin 4 (Blue): Task 2 - Signal 2*
+*Pin 5 (Orange): Maintenance Point - Signal 3*
+*Pin 6 (Red): Stop - Signal 4*
 
 ---
 
