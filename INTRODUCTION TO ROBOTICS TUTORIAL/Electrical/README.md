@@ -1,5 +1,3 @@
----
-
 ## Operator Interface Pinout
 The system includes a hardwired I/O Box for manual operator control. The wiring configuration links physical buttons to specific signal names within the robot controller.
 
