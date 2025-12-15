@@ -4,7 +4,7 @@
 
 - HMI (Human-Machine Interface): Contains the files (code, configuration) for the control panel developed for real-time interaction and monitoring of the robot.
 
-- RC+5.0 Program: 
+- RC+5.0 Program: This folder hosts the control software for the Epson robot. It contains the source code responsible for the kinematics, point management, and the execution sequences for both the Pick & Place (Task 1) and Stacking (Task 2) operations.
 
 - Task #1 - Pick and place: Includes the code and documentation for the fundamental task of picking up an object and placing it in a specific location.
 
