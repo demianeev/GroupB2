@@ -4,7 +4,7 @@ This operation consists of transporting tokens from a source base to a staging a
 
 ---
 
-Here you can find all files related to Task 1, including code and images.
+Here you can find all files related to Task 1, including code, videos and images.
 
 
 ![task 1 image](https://github.com/user-attachments/assets/10e6f275-2f13-4e6b-80cb-35118be8b82a)
