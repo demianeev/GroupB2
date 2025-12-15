@@ -5,4 +5,5 @@ This operation involves building a vertical stack using tokens that are initiall
 ---
 
 Here you can find all files related to Task 1, including code, videos and images.
-<img width="551" height="865" alt="image" src="https://github.com/user-attachments/assets/19658ac0-11c9-4fb1-8184-33f7a28c1ee3" />
+
+
