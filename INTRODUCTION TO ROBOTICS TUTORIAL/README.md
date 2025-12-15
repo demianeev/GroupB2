@@ -1,4 +1,4 @@
-This repository contains the documentation, code, and tutorials for the Introduction to Robotics project, focusing on the following core applications:
+### This repository contains the documentation, code, and tutorials for the Introduction to Robotics project, focusing on the following core applications:
 
 - Electrical: It contains the IO Diagram.
 
