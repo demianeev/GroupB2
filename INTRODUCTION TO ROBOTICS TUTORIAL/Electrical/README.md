@@ -13,3 +13,6 @@ The system includes a hardwired I/O Box for manual operator control. The wiring 
 When configuring the robot controller, ensure the input signals correspond to the Signal Name values listed in the table above. All sensors and solenoids operate on a 24V logic level compatible with the NPN terminal specification.
 
 ---
+
+<img width="775" height="831" alt="image" src="https://github.com/user-attachments/assets/d95599a6-045d-46f0-92c7-885ab507274d" />
+<img width="1067" height="376" alt="image" src="https://github.com/user-attachments/assets/d057fedf-4c12-416d-b997-034262b6b70e" />
