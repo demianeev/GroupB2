@@ -1,1 +1,1 @@
-
+This directory contains the source project (.emtp) for the robot's Human-Machine Interface. The panel is designed to manage the workflow by selecting between Task 1, Task 2, and Task 3, and others controls for execution.
