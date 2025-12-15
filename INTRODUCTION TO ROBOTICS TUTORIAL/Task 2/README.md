@@ -6,4 +6,4 @@ This operation involves building a vertical stack using tokens that are initiall
 
 Here you can find all files related to Task 1, including code, videos and images.
 
-
+![Task 2 image](https://github.com/user-attachments/assets/cbc8b00c-11d2-470b-a8e7-e28f1f6fd601)
