@@ -1,0 +1,365 @@
+﻿' Pick and place
+' good code
+' add timer
+
+Integer Tokens
+Integer Blocks
+Double TokenHeight
+Double BlockHeight
+
+Function main
+
+    Motor On
+    Power High
+    Speed 30
+    Accel 30, 30
+    SpeedS 500
+    AccelS 5000
+    Tool 1
+
+    Tokens = 3
+    Blocks = 3
+    TokenHeight = 6.0
+    BlockHeight = 6.0
+
+    Integer TokenID
+    Integer BlockID
+
+    Go Retract_Safe
+
+    '============================
+    '       TOKEN LOOP
+    '============================
+    
+    For TokenID = Tokens To 0 Step -1
+        Pick_Infeed_Token()
+        Alignment_Token()
+        Place_Tray_Token()
+    Next TokenID
+
+    '============================
+    '       BLOCK LOOP
+    '============================
+    For BlockID = Blocks To 0 Step -1
+        Pick_Infeed_Block()
+        Alignment_Block()
+        Place_Tray_Block()
+    Next BlockID
+
+    Go Retract_Safe
+
+Fend
+
+
+
+
+'===========================================
+'          PICK TOKEN
+'===========================================
+Function Pick_Infeed_Token
+    Print "Picking Token from Infeed. Token ID = ", Tokens
+
+    Go Infeed_Token +Z(50 + (Tokens * TokenHeight)) CP
+    Move Infeed_Token +Z(Tokens * TokenHeight)
+    On 8
+    Wait .5
+    Move Infeed_Token +X(-1) +Z(50 + (Tokens * TokenHeight)) CP
+
+Fend
+
+
+'===========================================
+'          PICK BLOCK
+'===========================================
+Function Pick_Infeed_Block
+    Print "Picking Block from Infeed. Block ID = ", Blocks
+
+    Go Infeed_Block +Z(50 + (Blocks * BlockHeight)) CP
+    Move Infeed_Block +Z(Blocks * BlockHeight)
+    On 8
+    Wait .5
+    Move Infeed_Block +X(-1) +Y(1) +Z(50 + (Blocks * BlockHeight)) CP
+
+Fend
+'-----------------------------------------------------
+
+'Task 2 
+
+'===========================
+'   VARIABLES GLOBALES
+'===========================
+Integer token_idx
+Integer block_idx
+Integer stack_idx
+Integer i
+Integer height
+
+'===========================
+Function Main
+'===========================
+  Motor On
+  Power High
+  Speed 30
+  Accel 30, 30
+  SpeedS 300
+  AccelS 5000
+
+  height = 6           ' Altura de cada objeto
+  token_idx = 9        ' Cantidad de tokens
+  block_idx = 9        ' Cantidad de blocks
+  stack_idx = 0        ' Contador de posiciones en pallet 3
+
+  Tool 1
+
+  '===========================
+  '   DEFINICION DE LOCALES
+  '===========================
+  Local 1, P_Token_Origin, P_Token_X, P_Token_Y
+  Local 2, P_Block_Origin, P_Block_X, P_Block_Y
+  Local 3, P_Stack_Origin, P_Stack_X, P_Stack_Y
+
+  '===========================
+  '   DEFINICION DE PALLETS
+  '===========================
+  Pallet 1, XY(0,0,0,0)/1, XY(0,0,height,0)/1, XY(0,0,height*2,0)/1, token_idx+1, 1
+  Pallet 2, XY(0,0,0,0)/2, XY(0,0,height,0)/2, XY(0,0,height*2,0)/2, block_idx+1, 1
+  Pallet 3, XY(0,0,0,0)/3, XY(0,0,height,0)/3, XY(0,0,height*2,0)/3, 20, 1
+
+
+
+  Go start
+  Wait Sw(0) = On
+
+  Do While Sw(0) = On
+    Xqt Task2
+    Wait 0.1
+  Loop
+
+Fend
+
+
+'===========================
+Function Task2
+'===========================
+  For i = 0 To 19
+
+    If (i Mod 2) = 0 Then
+       Pick_Block()
+    Else
+       Pick_Token()
+    EndIf
+
+    Place_Stack()
+
+  Next i
+
+  Go start
+Fend
+
+
+'===========================
+Function Pick_Block
+'===========================
+  Move PalletPos(2, block_idx, 0) /2 +Z(100)
+  Move PalletPos(2, block_idx, 0) /2
+
+  On 8        ' VACUUM ON
+  Wait 0.1
+
+  Move PalletPos(2, block_idx, 0) /2 +Z(60)
+
+  block_idx = block_idx - 1
+Fend
+
+
+'===========================
+Function Pick_Token
+'===========================
+  Move PalletPos(1, token_idx, 0) /1 +Z(100)
+  Move PalletPos(1, token_idx, 0) /1
+
+  On 8        ' VACUUM ON
+  Wait 0.1
+
+  Move PalletPos(1, token_idx, 0) /1 +Z(60)
+
+  token_idx = token_idx - 1
+Fend
+
+
+'===========================
+Function Place_Stack
+'===========================
+  Move PalletPos(3, stack_idx, 0) /3 +Z(80)
+  Move PalletPos(3, stack_idx, 0) /3
+
+  Off 8       ' VACUUM OFF
+  Wait 0.1
+
+  Move PalletPos(3, stack_idx, 0) /3 +Z(80)
+
+  stack_idx = stack_idx + 1
+Fend
+
+
+
+
+
+' change to pneumatic cylinder
+'===========================================
+'          ALIGN TOKEN
+'===========================================
+'Function Alignment_Token
+'    Print "Aligning Token. Token ID = ", Tokens
+'
+'    Go Align_Token +Z(20) CP
+'    Move Align_Token
+'    Off 8
+'
+'    Move Align_Token +X(5)
+'    Move Align_Token +X(5) +Z(5) CP
+'
+'    Go Align_Token +Z(5) CP
+'    Move Align_Token
+'
+'    On 8
+'    Wait .5
+'
+'    Move Align_Token +Z(20) CP
+'Fend
+
+'Change to pneumatic cylinder
+'===========================================
+'          ALIGN BLOCK
+'===========================================
+'Function Alignment_Block
+'    Print "Aligning Block. Block ID = ", Blocks
+'
+'    Go Align_Block +Z(20) CP
+'    Move Align_Block
+'    Off 8
+'
+'    Move Align_Block +Y(-5)
+'    Move Align_Block +X(5) +Y(-6) CP
+'    Move Align_Block +X(5) +Y(-6) +Z(5) CP
+'
+'    Go Align_Block +Z(5) CP
+'    Move Align_Block
+'
+'    On 8
+'    Wait .5
+'
+'    Move Align_Block +Z(20) CP
+'Fend
+
+
+' Implement pallet
+'===========================================
+'          PLACE TOKEN IN TRAY
+'===========================================
+Function Place_Tray_Token
+    Print "Placing Token in Tray. Tray Position ID = ", Tokens
+
+    Go Tray_Token +X(-.05 * Tokens) +Y(-30. * Tokens) +Z(20) CP
+    Move Tray_Token +X(-.05 * Tokens) +Y(-30. * Tokens)
+    Off 8
+    Wait .5
+    Move Tray_Token +X(-.05 * Tokens) +Y(-30. * Tokens) +Z(50) CP
+
+    Tokens = Tokens - 1
+Fend
+
+
+' Implement pallet
+'===========================================
+'          PLACE BLOCK IN TRAY
+'===========================================
+Function Place_Tray_Block
+    Print "Placing Block in Tray. Block Position ID = ", Blocks
+
+    Go Tray_Block +X(-.05 * Blocks) +Y(-30. * Blocks) +Z(20) CP
+    Move Tray_Block +X(-.05 * Blocks) +Y(-30. * Blocks)
+    Off 8
+    Wait .5
+    Move Tray_Block +X(-.05 * Blocks) +Y(-30. * Blocks) +Z(50) CP
+
+    Blocks = Blocks - 1
+Fend
+
+
+' Pallet code
+
+
+' Function palletSort
+'	Integer i, a
+'	
+'	Motor On
+'	Power High
+'	Speed 100, 50, 50
+'	Accel 100, 100, 50, 50, 50, 50
+'	Speed5 2000, 1000, 1000
+'	Accel5 20000, 20000, 10000, 10000, 10000, 10000
+'	
+'	Pallet 1, F3, F21, F20, 2, 3
+'	
+'	For i = 1 To 2
+'		For a = 1 To 3
+'			Go Pallet(1, i, a)
+'			Wait 0.1
+'		Next
+'	Next
+'Fend
+
+'------------------------------------------------------------
+
+
+' Bad pick & place
+
+' Pick and Place 1 to Pallet
+'
+' This program picks a part from one position and places it in a pallet
+'
+' Setup:
+' 1. Edit the values for PALLET_ROWS and PALLET_COLS
+' 2. Teach pick position
+' 3. Teach three corners of the pallet: pallet1, pallet2, pallet3
+'
+'#define PALLET_ROWS 10
+'#define PALLET_COLS 10
+'
+'Function main
+'
+'	Integer i
+'	Integer numOfPalletLocs
+'	Long cycleCount
+'
+'	InitRobot
+'
+'	' Define the robot pallet to place the parts in
+'	Pallet 1, pallet1, pallet2, pallet3, PALLET_COLS, PALLET_ROWS
+'
+'	numOfPalletLocs = PALLET_ROWS * PALLET_COLS
+'	Do
+'		' Wait for pallet ready
+'		Wait Sw(PalletInPos) = On
+'		Off PalletDone
+'
+'		' Pick and place a part in each pallet position
+'		For i = 1 To numOfPalletLocs
+'			Jump pick :Z(0)
+'			Wait Sw(PartInPos) = On
+'			Go pick
+'			On Gripper
+'			Wait .1
+'			Jump Pallet(1, i)
+'			Off Gripper
+'			Wait .1
+'			cycleCount = cycleCount + 1
+'			Print "Cycle count: ", cycleCount
+'		Next i
+'
+'		' Signal that the pallet is done
+'		On PalletDone
+'	Loop
+'
+'Fend
