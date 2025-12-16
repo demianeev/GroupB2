@@ -1,0 +1,299 @@
+'=========================================================
+' BACKUP MODE - Clasificacion por geometria (Tokens vs Blocks)
+' Epson RC+ 5.0 / RC180 / Epson C3
+'
+' Modo 1 (Sw1 - boton blanco):
+'   A) Para cada pieza en feeder (5 blocks + 5 tokens):
+'      - Pick en centro del feeder
+'      - Sube 30 mm
+'      - Rota 90¢X
+'      - Desplaza +9 mm en Y
+'      - Suelta sobre el punto medio del tray (Pallet 2, celda centro)
+'        -> Blocks quedan apoyados, Tokens caen al alojamiento
+'
+'   B) Luego:
+'      1) Recoge blocks (desde Z = +6 mm sobre el origen del local del tray)
+'         y los lleva al storage de blocks (Pallet 1, fila 1)
+'      2) Recoge tokens desde el centro del alojamiento (misma celda)
+'         y los lleva al storage de tokens (Pallet 1, fila 2)
+'
+' Pallets:
+'   Pallet 1: P14, P17, P16, 2, 3   (storage)
+'   Pallet 2: TB_P1, TB_P2, TB_P3, 3, 3 (tray/tic tac toe)
+'
+' Points assumed taught:
+'   Feeder_Token, Feeder_Block, Workablehight
+'   P14, P17, P16
+'   TB_P1, TB_P2, TB_P3
+'=========================================================
+
+'===========================
+' Variables
+'===========================
+Integer TokensTotal
+Integer BlocksTotal
+Double TokenHeight
+Double BlockHeight
+
+Double Nozzle_Height_Compensation
+Double Nozzle_Tray_Height_Compensation
+
+Integer tLeft
+Integer bLeft
+Integer slot
+
+' Tray center cell indices (3x3)
+Integer TR
+Integer TH
+
+' Heights / offsets
+Double Z_SAFE
+Double Z_LIFT30
+Double Z_TRAY_APPROACH
+Double Z_BLOCK_PICK_BASE
+Double Z_TOKEN_PICK_BASE
+
+Double Y_SHIFT
+Double ROT_90
+
+Integer piece
+
+'===========================
+' Main
+'===========================
+Function main
+
+    Motor On
+    Power Low
+    Speed 100
+    Accel 100, 100
+    SpeedS 800
+    AccelS 800, 800
+    Tool 1
+
+    ' Fixed counts
+    TokensTotal = 3
+    BlocksTotal = 3
+
+    TokenHeight = 6.0
+    BlockHeight = 6.0
+
+    Nozzle_Height_Compensation = 0.0
+    Nozzle_Tray_Height_Compensation = 4
+
+    ' Tray center cell (Row 2, Col 2)
+    TR = 2
+    TH = 2
+
+    ' Motion constants
+    Z_SAFE = 40
+    Z_LIFT30 = 30
+    Z_TRAY_APPROACH = 25
+
+    ' For picking blocks that are resting on top:
+    ' "6 mm above the origin of that local in Z"
+    Z_BLOCK_PICK_BASE = 6
+
+    ' Token pick base inside pocket (tune if needed)
+    Z_TOKEN_PICK_BASE = 0
+
+    Y_SHIFT = 9
+
+    ' Rotation amount
+    ROT_90 = 90
+
+    ' Pallets
+    Pallet 1, Corner1, Corner2, Corner3, 3, 3
+    Pallet 2, TB_P1, TB_P2, TB_P3, 3, 3
+
+    Go Workablehight CP
+
+    Do
+
+        '=========================
+        ' MODE 1 (Sw1): Classify
+        '=========================
+        If Sw(1) = On Then
+
+            Print "BACKUP CLASSIFY: START"
+            Go Workablehight CP
+
+            '-----------------------------------------
+            ' A) Drop ALL blocks onto tray center
+            '-----------------------------------------
+            For bLeft = BlocksTotal To 1 Step -1
+                piece = 1
+                Call Pick_From_Feeder_Block(bLeft)
+                Call Lift_Rotate_Shift()
+                Call Drop_On_Tray_Center(bLeft, piece)
+            Next bLeft
+
+            '-----------------------------------------
+            ' B) Drop ALL tokens onto tray center
+            '-----------------------------------------
+            For tLeft = TokensTotal To 1 Step -1
+				piece = 2
+                Call Pick_From_Feeder_Token(tLeft)
+                Call Lift_Rotate_Shift()
+                Call Drop_On_Tray_Center(tLeft, piece)
+            Next tLeft
+
+            '-----------------------------------------
+            ' C1) Pick BLOCKS from top and store (Pallet1 row1)
+            '-----------------------------------------
+            For slot = 1 To BlocksTotal
+                Call Pick_Block_From_Tray_Top(slot)
+                Call Store_Block(slot)
+            Next slot
+
+            '-----------------------------------------
+            ' C2) Pick TOKENS from pocket and store (Pallet1 row2)
+            '-----------------------------------------
+            For slot = 1 To TokensTotal
+                Call Pick_Token_From_Tray_Pocket(slot)
+                Call Store_Token(slot)
+            Next slot
+
+            Go Workablehight CP
+            Print "BACKUP CLASSIFY: DONE"
+
+            Wait Sw(1) = Off
+        EndIf
+
+    Loop
+
+Fend
+
+
+'=========================================================
+' Feeder pick (simple, stack-based)
+'=========================================================
+Function Pick_From_Feeder_Block(Blocks_Left As Integer)
+
+    Go Feeder_Block +Z(50 + (Blocks_Left * BlockHeight)) CP
+    Go Feeder_Block +Z((Blocks_Left * BlockHeight) + Nozzle_Height_Compensation)
+    On 8
+    Wait 0.25
+    Go Feeder_Block +Z(50 + (Blocks_Left * BlockHeight)) CP
+
+Fend
+
+
+Function Pick_From_Feeder_Token(Tokens_Left As Integer)
+
+    Go Feeder_Token +Z(50 + (Tokens_Left * TokenHeight)) CP
+    Go Feeder_Token +Z((Tokens_Left * TokenHeight) + Nozzle_Height_Compensation)
+    On 8
+    Wait 0.25
+    Go Feeder_Token +Z(50 + (Tokens_Left * TokenHeight)) CP
+
+Fend
+
+
+'=========================================================
+' Common motion: lift 30mm, rotate 90deg, shift +9mm in Y
+'=========================================================
+Function Lift_Rotate_Shift()
+
+    ' Lift +30mm (relative)
+    ' We are already at safe Z above feeder, so just do a small lift move
+    Move Here +Z(Z_LIFT30) CP
+
+    ' Rotate 90 degrees:
+    ' If your system uses a different orientation axis, change +U(ROT_90) accordingly.
+    ' Common alternatives: +W(ROT_90)
+'    Move Here +U(ROT_90) CP
+'
+'    ' Shift +9mm in Y
+'    Move Here +Y(Y_SHIFT) CP
+
+Fend
+
+
+'=========================================================
+' Drop all pieces onto tray center (Pallet2 row2 col2)
+'=========================================================
+Function Drop_On_Tray_Center(pLeft As Integer, pz As Integer)
+
+    Go Pallet(2, pz, pLeft) +Z(Z_TRAY_APPROACH) CP
+    Go Pallet(2, pz, pLeft) +Z(Nozzle_Tray_Height_Compensation)
+
+    Off 8
+    Wait 0.2
+
+    Go Pallet(2, pz, pLeft) +Z(Z_TRAY_APPROACH) CP
+    Go Workablehight CP
+
+Fend
+
+
+'=========================================================
+' Pick blocks from where they rest on top (Z=+6mm base + stack)
+'=========================================================
+Function Pick_Block_From_Tray_Top(slotIdx As Integer)
+
+    ' slotIdx goes 1..BlocksTotal
+    ' If blocks stacked on top of each other, pick from top:
+    ' top Z = base(6mm) + (BlocksTotal - slotIdx) * BlockHeight
+    Double zPick
+    zPick = 5
+
+    Go Pallet(2, 1, slotIdx) +Z(Z_SAFE) CP
+    Go Pallet(2, 1, slotIdx) +Z(zPick)
+
+    On 8
+    Wait 0.2
+
+    Go Pallet(2, 1, slotIdx) +Z(Z_SAFE) CP
+    Go Workablehight CP
+
+Fend
+
+
+'=========================================================
+' Pick tokens from inside pocket (tune Z_TOKEN_PICK_BASE if needed)
+'=========================================================
+Function Pick_Token_From_Tray_Pocket(slotIdx As Integer)
+
+    ' If tokens stack inside the pocket, you may want to add (TokensTotal-slotIdx)*TokenHeight
+    ' For now: base only (simplest). Tune if needed.
+    Double zPick
+    zPick = -9
+
+    Go Pallet(2, 2, slotIdx) +Z(Z_SAFE) CP
+    Go Pallet(2, 2, slotIdx) +Z(zPick)
+
+    On 8
+    Wait 0.2
+
+    Go Pallet(2, 2, slotIdx) +Z(Z_SAFE) CP
+    Go Workablehight CP
+
+Fend
+
+
+'=========================================================
+' Storage (Pallet1)
+'=========================================================
+Function Store_Block(slotIdx As Integer)
+
+    Go Pallet(1, 1, slotIdx) +Z(20) CP
+    Go Pallet(1, 1, slotIdx) +Z(Nozzle_Tray_Height_Compensation)
+    Off 8
+    Wait 0.2
+    Go Pallet(1, 1, slotIdx) +Z(20) CP
+    Go Workablehight CP
+
+Fend
+
+
+Function Store_Token(slotIdx As Integer)
+
+    Go Pallet(1, 2, slotIdx) +Z(20) CP
+    Go Pallet(1, 2, slotIdx) +Z(Nozzle_Tray_Height_Compensation)
+    Off 8
+    Wait 0.2
+    Go Pallet(1, 2, slotIdx) +Z(20) CP
+    Go Workablehight CP
+
+Fend
